@@ -239,7 +239,7 @@ class Entity(pg.sprite.Sprite):
         self.alive_flag: bool = True
         self.invuln_timer: float = 0.0
         #self.facing: int = 1 #1 = вправо, 1 = влево
-
+        #self.facing: int = 1 #1 = вправо, 1 = влево
     def _recolor(self, color: Tuple[int, int, int]) -> None:
         self.image.fill(color)
         pg.draw.rect(self.image, Settings.BLACK, self.image.get_rect(), 2)
