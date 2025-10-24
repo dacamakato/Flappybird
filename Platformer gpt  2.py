@@ -238,6 +238,7 @@ class Entity(pg.sprite.Sprite):
         self.health: int = health
         self.alive_flag: bool = True
         self.invuln_timer: float = 0.0
+        self.facing: int = 1  #
         #self.facing: int = 1 #1 = вправо, 1 = влево
 
     def _recolor(self, color: Tuple[int, int, int]) -> None:
@@ -245,9 +246,9 @@ class Entity(pg.sprite.Sprite):
         pg.draw.rect(self.image, Settings.BLACK, self.image.get_rect(), 2)
         
     def mirror_sprite(self, direction: int) -> None:
-        """Зеркально отразить спрайт в указанном направлении."""
+    #"""Зеркально отразить спрайт в указанном направлении."""
         if direction == 0:
-            return            
+            return
         new_facing = 1 if direction > 0 else -1
         if new_facing != self.facing:
             self.facing = new_facing
@@ -399,6 +400,7 @@ class Player(Entity):
         # Обновить направление взгляда
         if move_dir != 0:
             self.facing = move_dir
+            self.mirror_sprite(self.facing)
 
         # Прыжок с буфером и койот-таймером
         if keys[pg.K_SPACE]:
@@ -492,6 +494,7 @@ class Enemy(Entity):
         self.direction: int = -1
         self.contact_cd: float = 0.0
         self.last_hit_by_player: bool = False
+        self.facing: int = 1
     def update(self, dt: float) -> None:
         super().update(dt)
 
@@ -865,6 +868,7 @@ class Game:
             e.direction = -1  # повернуться влево
         # Сброс флага, чтобы не разворачивался каждый кадр
         e.last_hit_by_player = False
+        e.mirror_sprite(e.direction)
 
     # ------------------ Взаимодействия ------------------
     def handle_hazards(self) -> None:
@@ -874,6 +878,7 @@ class Game:
             self.player.take_damage(Settings.HAZARD_DAMAGE)
             self.player.dead = True
 
+        # Враги
         
 
         # Пули исчезают при касании хазарда или платформ
