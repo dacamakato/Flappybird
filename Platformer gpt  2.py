@@ -874,10 +874,7 @@ class Game:
             self.player.take_damage(Settings.HAZARD_DAMAGE)
             self.player.dead = True
 
-        # Враги
-        for e in self.level.enemies:
-            if pg.sprite.spritecollide(e, self.level.hazards, False):
-                e.take_damage(Settings.HAZARD_DAMAGE)
+        
 
         # Пули исчезают при касании хазарда или платформ
         for b in list(self.level.projectiles):
