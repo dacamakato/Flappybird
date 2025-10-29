@@ -401,6 +401,7 @@ class Player(Entity):
         if move_dir != 0:
             self.facing = move_dir
             self.mirror_sprite(self.facing)
+            
 
         # Прыжок с буфером и койот-таймером
         if keys[pg.K_SPACE]:
@@ -773,7 +774,7 @@ class Game:
 
         # Ближняя атака
         self.resolve_melee()
-
+##
         # Стрельба
         keys = pg.key.get_pressed()
         if keys[pg.K_k] and self.player.ranged.can_fire():
