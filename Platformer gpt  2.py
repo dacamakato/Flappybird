@@ -305,14 +305,33 @@ class Weapon:
     """Ближнее оружие: короткое окно атаки."""
 
     def __init__(self) -> None:
+    
         self.cooldown: float = 0.0
         self.active_time: float = 0.0
+
+        self.attack_frames: list[pg.Surface] = []
+        self.current_frame: int = -1
+        self.frame_timer: float = 0.0
+        self.frame_duration: float = 0.1
+
+    def load_attack_frames(self, rm: ResourceManager) -> None:
+        self.attack_frames = [
+            rm.load_image("attack1.png", (Settings.PLAYER_W, Settings.PLAYER_H), (255, 0, 0)), 
+            rm.load_image("attack2.png", (Settings.PLAYER_W, Settings.PLAYER_H), (255, 0, 0))
+
+        ]
+        self.current_frame = -1
 
     def try_attack(self) -> bool:
         """Запуск атаки, если кулдаун прошёл."""
         if self.cooldown <= 0.0 and self.active_time <= 0.0:
             self.cooldown = Settings.MELEE_COOLDOWN
             self.active_time = Settings.MELEE_ACTIVE_TIME
+            if self.attack_frames:
+                self.current_frame = 0
+                self.frame_timer = self.frame_duration
+            else:
+                self.current_frame = -1
             return True
         return False
 
@@ -321,7 +340,14 @@ class Weapon:
             self.cooldown -= dt
         if self.active_time > 0.0:
             self.active_time -= dt
-
+            self.frame_timer -= dt
+            if self.frame_timer <= 0.0 and self.attack_frames:
+                self.frame_timer = self.frame_duration
+                self.current_frame = (self.current_frame + 1) % len(self.attack_frames)
+    def get_current_frame(self) -> Optional[pg.Surface]:
+        if not self.is_active or not self.attack_frames:
+            return None
+        return self.attack_frames[self.current_frame]
     def is_active(self) -> bool:
         return self.active_time > 0.0
 
@@ -374,11 +400,13 @@ class Player(Entity):
     def __init__(self, pos: Tuple[int, int]) -> None:
         rect = pg.Rect(pos[0], pos[1], Settings.PLAYER_W, Settings.PLAYER_H)
         super().__init__(rect, Settings.BLUE, Settings.PLAYER_MAX_HEALTH)
-        self.image = rm.load_image("player.png", (Settings.PLAYER_W, Settings.PLAYER_H), (0, 255, 0))
+        self.image_idle = rm.load_image("player.png", (Settings.PLAYER_W, Settings.PLAYER_H), (0, 255, 0))
+        self.image = self.image_idle
         self.on_ground: bool = False
         self.coyote_timer: float = 0.0
         self.jump_buffer: float = 0.0
         self.melee = Weapon()
+        self.melee.load_attack_frames(rm)
         self.ranged = RangedWeapon()
         self.facing: int = 1  # 1 вправо, -1 влево
         self.contact_cd: float = 0.0
@@ -438,6 +466,14 @@ class Player(Entity):
         super().update(dt)
         self.melee.update(dt)
         self.ranged.update(dt)
+        #Ближние атаки
+        attack_frame = self.melee.get_current_frame()
+        if attack_frame is not None:
+            self.image = attack_frame
+            if self.facing < 0:
+                self.image = pg.transform.flip(self.image, True, False)
+        else:
+            self.image = self.image_idle
 
         # Гравитация
         self.acc.y = Settings.GRAVITY
