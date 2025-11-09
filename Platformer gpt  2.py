@@ -154,6 +154,7 @@ class ResourceManager:
         self.font_small = pg.font.SysFont(None, 18)
         self.font = pg.font.SysFont(None, 24)
         self.font_big = pg.font.SysFont(None, 48)
+        self.background = self.load_image("background3.png", (Settings.WIDTH, Settings.HEIGHT), Settings.BG_COLOR)
 
         # Кэш примитивных тайлов
         self.tile_platform = self._make_tile(Settings.PLATFORM_COLOR)
@@ -163,7 +164,7 @@ class ResourceManager:
     def load_image(self, filename, size, fallback_color):
         path = os.path.join(self.asset_dir, filename)
         if os.path.exists(path):
-            img = pg.image.load(path).convert_alpha()
+            img = pg.image.load(path).copy() 
             return pg.transform.scale(img, size)
         else:
             # fallback
@@ -955,16 +956,10 @@ class Game:
     # ------------------ Отрисовка ------------------
     def draw(self) -> None:
         """Отрисовать мир, сущности, HUD и состояние."""
-        self.screen.fill(Settings.BG_COLOR)
+        self.screen.blit(self.rm.background, (0, 0))
 
         # Подложка мира
-        world_rect = pg.Rect(
-            -int(self.camera.offset.x),
-            -int(self.camera.offset.y),
-            self.level.world_w,
-            self.level.world_h,
-        )
-        pg.draw.rect(self.screen, Settings.WORLD_BG, self.camera.apply(world_rect))
+        
 
         # Отрисовка всех спрайтов с учётом камеры
         for spr in self.level.all_drawables:
