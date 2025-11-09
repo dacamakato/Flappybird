@@ -157,9 +157,9 @@ class ResourceManager:
         self.background = self.load_image("background3.png", (Settings.WIDTH, Settings.HEIGHT), Settings.BG_COLOR)
 
         # Кэш примитивных тайлов
-        self.tile_platform = self._make_tile(Settings.PLATFORM_COLOR)
-        self.tile_hazard = self._make_tile(Settings.HAZARD_COLOR)
-        self.tile_exit = self._make_tile(Settings.EXIT_COLOR)
+        self.tile_platform = self.load_image("platform1.png", (Settings.TILE, Settings.TILE), Settings.PLATFORM_COLOR)
+        self.tile_hazard = self.load_image("my_hazard.png", (Settings.TILE, Settings.TILE), Settings.HAZARD_COLOR)
+        self.tile_exit = self.load_image("my_exit.png", (Settings.TILE, Settings.TILE), Settings.EXIT_COLOR)
 
     def load_image(self, filename, size, fallback_color):
         path = os.path.join(self.asset_dir, filename)
